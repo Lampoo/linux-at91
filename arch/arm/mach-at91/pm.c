@@ -539,7 +539,9 @@ static void __init at91_pm_backup_init(void)
 
 	pm_bu->suspended = 0;
 	pm_bu->canary = virt_to_phys(&canary);
+#ifdef CONFIG_ARM_CPU_SUSPEND
 	pm_bu->resume = virt_to_phys(cpu_resume);
+#endif
 
 	return;
 
