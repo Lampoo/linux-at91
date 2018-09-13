@@ -2,6 +2,10 @@ menu "Android"
 
 if ANDROID
 
+config ANDROID_LOGGER
+	tristate "Android log driver"
+	default n
+
 config ASHMEM
 	bool "Enable the Anonymous Shared Memory Subsystem"
 	default n
