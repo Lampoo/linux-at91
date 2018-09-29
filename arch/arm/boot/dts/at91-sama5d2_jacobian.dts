@@ -1,0 +1,316 @@
+/*
+ * at91-sama5d2_bootstrap.dts - Device Tree file for SAMA5D2 Jacobian board
+ *
+ *  Copyright (C) 2018 Yuneec,
+ *                2018 Yonghua Zheng <yh.zheng@yuneec.com>
+ *
+ * This file is dual-licensed: you can use it either under the terms
+ * of the GPL or the X11 license, at your option. Note that this dual
+ * licensing only applies to this file, and not this project as a
+ * whole.
+ *
+ *  a) This file is free software; you can redistribute it and/or
+ *     modify it under the terms of the GNU General Public License as
+ *     published by the Free Software Foundation; either version 2 of the
+ *     License, or (at your option) any later version.
+ *
+ *     This file is distributed in the hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *     GNU General Public License for more details.
+ *
+ * Or, alternatively,
+ *
+ *  b) Permission is hereby granted, free of charge, to any person
+ *     obtaining a copy of this software and associated documentation
+ *     files (the "Software"), to deal in the Software without
+ *     restriction, including without limitation the rights to use,
+ *     copy, modify, merge, publish, distribute, sublicense, and/or
+ *     sell copies of the Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the following
+ *     conditions:
+ *
+ *     The above copyright notice and this permission notice shall be
+ *     included in all copies or substantial portions of the Software.
+ *
+ *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+ *     OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ *     NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+ *     HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+ *     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ *     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ *     OTHER DEALINGS IN THE SOFTWARE.
+ */
+/dts-v1/;
+#include "sama5d2.dtsi"
+#include "sama5d2-pinfunc.h"
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/pinctrl/at91.h>
+
+/ {
+	model = "Atmel SAMA5D2 Jacobian";
+	compatible = "atmel,sama5d2-jacobian", "atmel,sama5d2", "atmel,sama5";
+
+	aliases {
+		serial0 = &uart3;
+		serial1 = &uart4;
+	};
+
+	chosen {
+		stdout-path = "serial0:115200n8";
+	};
+
+	clocks {
+		slow_xtal {
+			clock-frequency = <32768>;
+		};
+
+		main_xtal {
+			clock-frequency = <12000000>;
+		};
+	};
+
+	ahb {
+		usb0: gadget@00300000 {
+			atmel,vbus-gpio = <&pioA 31 GPIO_ACTIVE_HIGH>;
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usba_vbus>;
+			status = "okay";
+		};
+
+		apb {
+			pmc: pmc@f0014000 {
+				pmc_fast_restart {
+					compatible = "atmel,sama5d2-pmc-fast-startup";
+					#address-cells = <1>;
+					#size-cells = <0>;
+
+					atmel,wakeup-rtc-timer;
+
+					wkpin: input@0 {
+						reg = <0>;
+					};
+
+					gmac_wol: input@10 {
+						reg = <10>;
+						atmel,wakeup-active-high;
+					};
+				};
+			};
+
+			qspi0: spi@f0020000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_qspi0_default>;
+				status = "okay"; /* conflict with sdmmc1 */
+
+				flash@0 {
+					#address-cells = <1>;
+					#size-cells = <1>;
+					compatible = "jedec,spi-nor";
+					reg = <0>;
+					spi-max-frequency = <83000000>;
+					m25p,fast-read;
+
+					at91bootstrap@00000000 {
+						label = "at91bootstrap";
+						reg = <0x00000000 0x00004000>;
+					};
+
+					bootloaderenv@00010000 {
+						label = "bootloader env";
+						reg = <0x00004000 0x00004000>;
+					};
+
+					bootloader@00020000 {
+						label = "bootloader";
+						reg = <0x00008000 0x00058000>;
+					};
+
+					dtb@00070000 {
+						label = "device tree";
+						reg = <0x00060000 0x0000C000>;
+					};
+
+					kernel@00080000 {
+						label = "kernel";
+						reg = <0x0006C000 0x00394000>;
+					};
+
+					system@00400000 {
+						label = "rootfs";
+						reg = <0x00400000 0x00C00000>;
+					};
+
+					userdata@00400000 {
+						label = "userdata";
+						reg = <0x01000000 0x00000000>;
+					};
+				};
+			};
+
+			spi0: spi@f8000000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_spi0_default>;
+				status = "okay";
+			};
+
+			shdwc@f8048010 {
+				atmel,shdwc-debouncer = <976>;
+				atmel,wakeup-rtc-timer;
+
+				input@0 {
+					reg = <0>;
+					atmel,wakeup-type = "low";
+				};
+			};
+
+			watchdog@f8048040 {
+				status = "okay";
+			};
+
+			uart3: serial@fc008000 {
+				atmel,use-dma-rx;
+				atmel,use-dma-tx;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_uart3_default>;
+				status = "okay";
+			};
+
+			uart4: serial@fc00c000 {
+				atmel,use-dma-rx;
+				atmel,use-dma-tx;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_uart4_default>;
+				status = "okay";
+			};
+
+			i2c0: i2c@f8028000 {
+				dmas = <0>, <0>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_i2c0_default>;
+				status = "okay";
+			};
+
+			isc: isc@f0008000 {
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_isc_base &pinctrl_isc_data_8bit>;
+				status = "okay";
+
+				port {
+					isc_0: endpoint@0 {
+						remote-endpoint = <&ov9282_0>;
+						hsync-active = <1>;
+						vsync-active = <0>;
+						pclk-sample = <1>;
+					};
+				};
+			};
+
+			i2c1: i2c@fc028000 {
+				dmas = <0>, <0>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_i2c1_default>;
+				status = "okay";
+
+				ov9282: camera@21 {
+					compatible = "ovti,ov9282";
+					reg = <0x21>;
+					pinctrl-names = "default";
+					pinctrl-0 = <&pinctrl_sensor_reset>;
+					clocks = <&isc>;
+					clock-names = "xvclk";
+					assigned-clocks = <&isc>;
+					assigned-clock-rates = <24000000>;
+					resetb-gpios = <&pioA 119 GPIO_ACTIVE_LOW>;
+
+					port {
+						ov9282_0: endpoint {
+							remote-endpoint = <&isc_0>;
+						};
+					};
+				};
+			};
+
+			pinctrl@fc038000 {
+				pinctrl_isc_base: isc_base {
+					pinmux = <PIN_PD20__ISC_PCK>,
+						 <PIN_PD21__ISC_VSYNC>,
+						 <PIN_PD22__ISC_HSYNC>,
+						 <PIN_PD11__ISC_MCK>;
+					bias-disable;
+				};
+
+				pinctrl_isc_data_8bit: isc_data_8bit {
+					pinmux = <PIN_PD19__ISC_D11>,
+						 <PIN_PD18__ISC_D10>,
+						 <PIN_PD17__ISC_D9>,
+						 <PIN_PD16__ISC_D8>,
+						 <PIN_PD15__ISC_D7>,
+						 <PIN_PD14__ISC_D6>,
+						 <PIN_PD13__ISC_D5>,
+						 <PIN_PD12__ISC_D4>;
+					bias-disable;
+				};
+
+				pinctrl_sensor_reset: sensor_reset {
+					pinmux = <PIN_PD23__GPIO>;
+					bias-disable;
+				};
+
+				pinctrl_qspi0_default: qspi0_default {
+					sck_cs {
+						pinmux = <PIN_PA22__QSPI0_SCK>,
+							 <PIN_PA23__QSPI0_CS>;
+						bias-disable;
+					};
+
+					data {
+						pinmux = <PIN_PA24__QSPI0_IO0>,
+							 <PIN_PA25__QSPI0_IO1>,
+							 <PIN_PA26__QSPI0_IO2>,
+							 <PIN_PA27__QSPI0_IO3>;
+						bias-pull-up;
+					};
+				};
+
+				pinctrl_i2c0_default: i2c0_default {
+					pinmux = <PIN_PB31__TWD0>,
+						 <PIN_PC0__TWCK0>;
+					bias-disable;
+				};
+
+				pinctrl_i2c1_default: i2c1_default {
+					pinmux = <PIN_PC6__TWD1>,
+						 <PIN_PC7__TWCK1>;
+					bias-disable;
+				};
+
+				pinctrl_spi0_default: spi0_default {
+					pinmux = <PIN_PA14__SPI0_SPCK>,
+						 <PIN_PA15__SPI0_MOSI>,
+						 <PIN_PA16__SPI0_MISO>,
+						 <PIN_PA17__SPI0_NPCS0>;
+					bias-disable;
+				};
+
+				pinctrl_uart3_default: uart3_default {
+					pinmux = <PIN_PB11__URXD3>,
+						 <PIN_PB12__UTXD3>;
+					bias-disable;
+				};
+
+				pinctrl_uart4_default: uart4_default {
+					pinmux = <PIN_PB3__URXD4>,
+						 <PIN_PB4__UTXD4>;
+					bias-disable;
+				};
+
+				pinctrl_usba_vbus: usba_vbus {
+					pinmux = <PIN_PA31__GPIO>;
+					bias-disable;
+				};
+			};
+		};
+	};
+};
