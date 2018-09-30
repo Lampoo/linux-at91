@@ -190,6 +190,10 @@
 				pinctrl-names = "default";
 				pinctrl-0 = <&pinctrl_i2c0_default>;
 				status = "okay";
+				ISL_29501@53{
+					compatible = "renesas,isl29501";
+					reg = <0x53>;
+				};
 			};
 
 			isc: isc@f0008000 {
