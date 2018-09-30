@@ -142,8 +142,8 @@
 						reg = <0x00400000 0x00C00000>;
 					};
 
-					userdata@00400000 {
-						label = "userdata";
+					data@00400000 {
+						label = "data";
 						reg = <0x01000000 0x00000000>;
 					};
 				};
