@@ -12,6 +12,8 @@
 #include <linux/module.h>
 #include <linux/i2c.h>
 #include <linux/err.h>
+#include <linux/gpio/consumer.h>
+#include <linux/gpio.h>
 #include <linux/of_device.h>
 #include <linux/iio/iio.h>
 #include <linux/iio/sysfs.h>
@@ -108,6 +110,7 @@ struct isl29501_private {
 	struct mutex lock;
 	/* Exact representation of correction coefficients. */
 	unsigned int shadow_coeffs[COEFF_MAX];
+	struct gpio_desc *enable_gpio;
 };
 
 enum isl29501_register_name {
@@ -919,6 +922,13 @@ static const struct iio_info isl29501_info = {
 static int isl29501_init_chip(struct isl29501_private *isl29501)
 {
 	int ret;
+
+	isl29501->enable_gpio = devm_gpiod_get_optional(&isl29501->client->dev,
+							"enable", GPIOD_ASIS);
+	if (!IS_ERR(isl29501->enable_gpio)) {
+		/* enable the chip if a gpio line is provided */
+		gpiod_direction_output(isl29501->enable_gpio, 1);
+	}
 
 	ret = i2c_smbus_read_byte_data(isl29501->client, ISL29501_DEVICE_ID);
 	if (ret < 0) {
