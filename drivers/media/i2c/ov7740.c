@@ -52,8 +52,34 @@ struct ov7740_framesize {
 };
 
 static const struct reg_sequence ov7740_vga[] = {
+	/**********************************************************************
+	 * REG55   default       description
+	 * ====================================================================
+	 * 0x55      0x40        BIT[7:6] - PLLDIV
+	 *                       00: x1
+	 *                       01: x4
+	 *                       02: x6
+	 *                       03: x8
+	 *                       BIT[5:4] - PreDIV
+	 *                       00: /1
+	 *                       01: /2
+	 *                       02: /3
+	 *                       03: /4
+	 *                       BIT[3:9] - Clock Control
+	 *                       Changine these value is not recommended
+	 *
+	 * CLK     default       description
+	 * ====================================================================
+	 * 0x11      0x00        BIT[7:6]: PLL setting
+	 *                       Changine these value is not recommended
+	 *                       BIT[5:0]: Clock divider
+	 *                       sysclk = XTAL*PLLDIV/((CLK[5:0]+1)*2*PreDiv)
+	 *
+	 * 30.0fps CLK = 01; 20.0fps CLK = 01; 15.0fps CLK = 03;
+	 * 10.0fps CLK = 05; 07.5fps CLK = 07;
+	 *********************************************************************/
 	{0x55 ,0x40},
-	{0x11 ,0x02},
+	{0x11 ,0x01},
 
 	{0xd5 ,0x10},
 	{0x0c ,0x12},
@@ -94,17 +120,16 @@ static const struct reg_sequence ov7740_vga[] = {
 	{0x67 ,0x88},
 	{0x68 ,0x1a},
 
-	{0x14 ,0x28},
+	{0x14 ,0x28},	// 38/28/18 for 16/8/4x gain ceiling
 	{0x24 ,0x3c},
 	{0x25 ,0x30},
 	{0x26 ,0x72},
-	{0x50 ,0x97},
-	{0x51 ,0x1f},
+	{0x50 ,0x97},	// 12e/97/4b/25 for 60/30/15/7.5fps, 50HZ
+	{0x51 ,0x7e},	// fc/7e/3f/1f for 60/30/15/7.5fps, 60HZ
 	{0x52 ,0x00},
 	{0x53 ,0x00},
 	{0x20 ,0x00},
-	{0x21 ,0xcf},
-	{0x50, 0x4b},
+	{0x21 ,0x23},	// 01/23/57/cf for 60/30/15/7.5fps
 	{0x38 ,0x14},
 	{0xe9 ,0x00},
 	{0x56 ,0x55},
@@ -230,7 +255,7 @@ static int ov7740_g_parm(struct v4l2_subdev *sd, struct v4l2_streamparm *parms)
 	cp->capability = V4L2_CAP_TIMEPERFRAME;
 
 	tpf->numerator = 1;
-	tpf->denominator = 60;
+	tpf->denominator = 30;
 
 	return 0;
 }
@@ -248,7 +273,7 @@ static int ov7740_s_parm(struct v4l2_subdev *sd, struct v4l2_streamparm *parms)
 	cp->capability = V4L2_CAP_TIMEPERFRAME;
 
 	tpf->numerator = 1;
-	tpf->denominator = 60;
+	tpf->denominator = 30;
 
 	return 0;
 }
@@ -381,7 +406,7 @@ static int ov7740_enum_frame_interval(struct v4l2_subdev *sd,
 		return -EINVAL;
 
 	fie->interval.numerator = 1;
-	fie->interval.denominator = 60;
+	fie->interval.denominator = 30;
 
 	return 0;
 }
