@@ -196,12 +196,163 @@ static const struct reg_sequence ov7740_vga[] = {
 	{0x0f ,0x1f},
 };
 
+static const struct reg_sequence ov7740_qvga[] = {
+	/**********************************************************************
+	 * REG55   default       description
+	 * ====================================================================
+	 * 0x55      0x40        BIT[7:6] - PLLDIV
+	 *                       00: x1
+	 *                       01: x4
+	 *                       02: x6
+	 *                       03: x8
+	 *                       BIT[5:4] - PreDIV
+	 *                       00: /1
+	 *                       01: /2
+	 *                       02: /3
+	 *                       03: /4
+	 *                       BIT[3:9] - Clock Control
+	 *                       Changine these value is not recommended
+	 *
+	 * CLK     default       description
+	 * ====================================================================
+	 * 0x11      0x00        BIT[7:6]: PLL setting
+	 *                       Changine these value is not recommended
+	 *                       BIT[5:0]: Clock divider
+	 *                       sysclk = XTAL*PLLDIV/((CLK[5:0]+1)*2*PreDiv)
+	 *
+	 * 30.0fps CLK = 01; 20.0fps CLK = 01; 15.0fps CLK = 03;
+	 * 10.0fps CLK = 05; 07.5fps CLK = 07;
+	 *********************************************************************/
+	{0x55 ,0x40},
+	{0x11 ,0x01},
+
+	{0xd5 ,0x10},
+	{0x0c ,0x12},
+	{0x0d ,0x34},
+	{0x17 ,0x25},
+	{0x18 ,0xa0},
+	{0x19 ,0x03},
+	{0x1a ,0xf0},
+	{0x1b ,0x89},
+	{0x22 ,0x03},
+	{0x29 ,0x18},
+	{0x2b ,0xf8},
+	{0x2c ,0x01},
+	{REG_HOUTSIZE ,0x50},
+	{REG_VOUTSIZE ,0x78},
+	{0x33 ,0xc4},
+	{REG_OUTSIZE_LSB, 0x0},
+	{0x35 ,0x05},
+	//{0x36 ,0x3f},
+	{0x04 ,0x60},
+	{0x27 ,0x80},
+	{0x3d ,0x0f},
+	{0x3e ,0x80},
+	{0x3f ,0x40},
+	{0x40 ,0x7f},
+	{0x41 ,0x6a},
+	{0x42 ,0x29},
+	{0x44 ,0x22},
+	{0x45 ,0x41},
+	{0x47 ,0x02},
+	{0x49 ,0x64},
+	{0x4a ,0xa1},
+	{0x4b ,0x40},
+	{0x4c ,0x1a},
+	{0x4d ,0x50},
+	{0x4e ,0x13},
+	{0x64 ,0x00},
+	{0x67 ,0x88},
+	{0x68 ,0x1a},
+
+	{0x14 ,0x28},	// 38/28/18 for 16/8/4x gain ceiling
+	{0x24 ,0x3c},
+	{0x25 ,0x30},
+	{0x26 ,0x72},
+	{0x50 ,0x97},	// 12e/97/4b/25 for 60/30/15/7.5fps, 50HZ
+	{0x51 ,0x7e},	// fc/7e/3f/1f for 60/30/15/7.5fps, 60HZ
+	{0x52 ,0x00},
+	{0x53 ,0x00},
+	{0x20 ,0x00},
+	{0x21 ,0x23},	// 01/23/57/cf for 60/30/15/7.5fps
+	{0x38 ,0x14},
+	{0xe9 ,0x00},
+	{0x56 ,0x55},
+	{0x57 ,0xff},
+	{0x58 ,0xff},
+	{0x59 ,0xff},
+	{0x5f ,0x04},
+	{0xec ,0x00},
+	{0x13 ,0xff},
+
+	//{0x80 ,0x7f},
+	{0x81 ,0x3f},
+	{0x82 ,0x3f},
+	//{0x83 ,0x01},
+	{0x38 ,0x11},
+	{0x84 ,0x70},
+	{0x85 ,0x00},
+	{0x86 ,0x03},
+	{0x87 ,0x01},
+	{0x88 ,0x05},
+	{0x89 ,0x30},
+	{0x8d ,0x30},
+	{0x8f ,0x85},
+	{0x93 ,0x30},
+	{0x95 ,0x85},
+	{0x99 ,0x30},
+	{0x9b ,0x85},
+
+	{0x9c ,0x08},
+	{0x9d ,0x12},
+	{0x9e ,0x23},
+	{0x9f ,0x45},
+	{0xa0 ,0x55},
+	{0xa1 ,0x64},
+	{0xa2 ,0x72},
+	{0xa3 ,0x7f},
+	{0xa4 ,0x8b},
+	{0xa5 ,0x95},
+	{0xa6 ,0xa7},
+	{0xa7 ,0xb5},
+	{0xa8 ,0xcb},
+	{0xa9 ,0xdd},
+	{0xaa ,0xec},
+	{0xab ,0x1a},
+
+	{0xce ,0x78},
+	{0xcf ,0x6e},
+	{0xd0 ,0x0a},
+	{0xd1 ,0x0c},
+	{0xd2 ,0x84},
+	{0xd3 ,0x90},
+	{0xd4 ,0x1e},
+
+	{0x5a ,0x24},
+	{0x5b ,0x1f},
+	{0x5c ,0x88},
+	{0x5d ,0x60},
+
+	{0xac ,0x6e},
+	{0xbe ,0xff},
+	{0xbf ,0x00},
+
+	{0x0f ,0x1d},
+	{0x0f ,0x1f},
+};
+
 static const struct ov7740_framesize ov7740_framesizes[] = {
         { /* VGA 640x480 */
                 .width          = VGA_WIDTH,
 		.height		= VGA_HEIGHT,
 		.regs		= ov7740_vga,
 		.reg_num        = ARRAY_SIZE(ov7740_vga),
+	},
+        { /* VGA 320x240 */
+                .width          = QVGA_WIDTH,
+		.height		= QVGA_HEIGHT,
+		.regs		= ov7740_qvga,
+		.reg_num        = ARRAY_SIZE(ov7740_qvga),
 	},
 };
 
@@ -335,22 +486,23 @@ ov7740_set_frame_size(u32 *width, u32 *height)
         u32 frm_height = *height;
         int i;
 
-        for (i = 0; i < (ARRAY_SIZE(ov7740_framesizes) - 1); i++) {
-                if ((fsize->width >= frm_width) &&
-                    (fsize->height>= frm_height)) {
-                    *width = fsize->width;
-                    *height = fsize->height;
+        for (i = 0; i < ARRAY_SIZE(ov7740_framesizes); i++) {
+		if (fsize->width == frm_width && fsize->height == frm_height) {
+			*width = fsize->width;
+			*height = fsize->height;
 
-                    return fsize;
-                }
+			return fsize;
+		}
 
-                fsize++;
-        }
+		fsize++;
+	}
+
+	fsize = &ov7740_framesizes[0];
 
         *width = fsize->width;
-        *height = fsize->height;
+	*height = fsize->height;
 
-        return fsize;
+	return fsize;
 }
 
 
@@ -396,13 +548,21 @@ static int ov7740_enum_frame_interval(struct v4l2_subdev *sd,
 				      struct v4l2_subdev_pad_config *cfg,
 				struct v4l2_subdev_frame_interval_enum *fie)
 {
+	int index;
+
 	if (fie->pad)
 		return -EINVAL;
 
 	if (fie->index >= 1)
 		return -EINVAL;
 
-	if ((fie->width != VGA_WIDTH) || (fie->height != VGA_HEIGHT))
+	for (index = 0; index < ARRAY_SIZE(ov7740_framesizes); index++) {
+		if (fie->width == ov7740_framesizes[index].width &&
+		    fie->height == ov7740_framesizes[index].height)
+			break;
+	}
+
+	if (index >= ARRAY_SIZE(ov7740_framesizes))
 		return -EINVAL;
 
 	fie->interval.numerator = 1;
@@ -418,11 +578,13 @@ static int ov7740_enum_frame_size(struct v4l2_subdev *sd,
 	if (fse->pad)
 		return -EINVAL;
 
-	if (fse->index > 0)
+	if (fse->index >= ARRAY_SIZE(ov7740_framesizes))
 		return -EINVAL;
 
-	fse->min_width = fse->max_width = VGA_WIDTH;
-	fse->min_height = fse->max_height = VGA_HEIGHT;
+	fse->min_width  = ov7740_framesizes[fse->index].width;
+	fse->max_width  = fse->min_width;
+	fse->min_height = ov7740_framesizes[fse->index].height;
+	fse->max_height = fse->min_height;
 
 	return 0;
 }
