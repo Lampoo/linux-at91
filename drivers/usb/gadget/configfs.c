@@ -265,7 +265,7 @@ static ssize_t gadget_dev_desc_UDC_store(struct config_item *item,
 
 	mutex_lock(&gi->lock);
 
-	if (!strlen(name)) {
+	if (!strlen(name) || !strncmp(name, "none", 4)) {
 		ret = unregister_gadget(gi);
 		if (ret)
 			goto err;
