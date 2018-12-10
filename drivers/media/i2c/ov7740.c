@@ -75,10 +75,10 @@ static const struct reg_sequence ov7740_vga[] = {
 	 *                       BIT[5:0]: Clock divider
 	 *                       sysclk = XTAL*PLLDIV/((CLK[5:0]+1)*2*PreDiv)
 	 *
-	 * 30.0fps CLK = 01; 20.0fps CLK = 01; 15.0fps CLK = 03;
+	 * 30.0fps CLK = 01; 20.0fps CLK = 02; 15.0fps CLK = 03;
 	 * 10.0fps CLK = 05; 07.5fps CLK = 07;
 	 *********************************************************************/
-	{0x55 ,0x40},
+	{0x55 ,0x40}, // {0x55,0xc0} {0x11, 0x01} for 60fps
 	{0x11 ,0x01},
 
 	{0xd5 ,0x10},
@@ -220,10 +220,10 @@ static const struct reg_sequence ov7740_qvga[] = {
 	 *                       BIT[5:0]: Clock divider
 	 *                       sysclk = XTAL*PLLDIV/((CLK[5:0]+1)*2*PreDiv)
 	 *
-	 * 30.0fps CLK = 01; 20.0fps CLK = 01; 15.0fps CLK = 03;
+	 * 30.0fps CLK = 01; 20.0fps CLK = 02; 15.0fps CLK = 03;
 	 * 10.0fps CLK = 05; 07.5fps CLK = 07;
 	 *********************************************************************/
-	{0x55 ,0x40},
+	{0x55 ,0x40}, // {0x55,0xc0} {0x11, 0x01} for 60fps
 	{0x11 ,0x01},
 
 	{0xd5 ,0x10},
